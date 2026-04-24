@@ -63,7 +63,7 @@ fi
 
 # Install Python dependencies
 echo "Installing Python dependencies..."
-if pip3 install flask psutil gunicorn; then
+if pip3 install --break-system-packages flask psutil gunicorn; then
     echo "✅ Python dependencies installed"
 else
     echo "❌ Failed to install Python dependencies"
