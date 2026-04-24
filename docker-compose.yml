@@ -1,0 +1,73 @@
+version: "3.9"
+services:
+
+  # ── Langfuse DB ─────────────────────────────────────────────────────────────
+  langfuse-db:
+    image: postgres:15-alpine
+    container_name: agentia-langfuse-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: langfuse
+      POSTGRES_PASSWORD: langfuse2026
+      POSTGRES_DB: langfuse
+    volumes:
+      - ~/agentia/docker-volumes/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U langfuse"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── ClickHouse for Langfuse ────────────────────────────────────────────────
+  langfuse-clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: agentia-langfuse-clickhouse
+    restart: unless-stopped
+    volumes:
+      - ~/agentia/docker-volumes/clickhouse:/var/lib/clickhouse
+    healthcheck:
+      test: ["CMD-SHELL","wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Langfuse ─────────────────────────────────────────────────────────────────
+  langfuse:
+    image: langfuse/langfuse:latest
+    container_name: agentia-langfuse
+    restart: unless-stopped
+    ports:
+      - "23452:3000"
+    environment:
+      DATABASE_URL: postgresql://langfuse:langfuse2026@langfuse-db:5432/langfuse
+      NEXTAUTH_SECRET: agentia-langfuse-secret-2026
+      NEXTAUTH_URL: http://localhost:23452
+      TELEMETRY_ENABLED: "false"
+      CLICKHOUSE_URL: clickhouse://langfuse-clickhouse:8123
+      CLICKHOUSE_MIGRATION_URL: clickhouse://langfuse-clickhouse:8123
+      CLICKHOUSE_USER: langfuse
+      CLICKHOUSE_PASSWORD: langfuse2026
+    depends_on:
+      langfuse-db:
+        condition: service_healthy
+      langfuse-clickhouse:
+        condition: service_healthy
+
+  # ── Open WebUI (replaces LobeChat — auto-wired to LiteLLM) ─────────────────
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: agentia-openwebui
+    restart: unless-stopped
+    ports:
+      - "23451:8080"
+    environment:
+      OPENAI_API_BASE_URL: http://host.docker.internal:12341/v1
+      OPENAI_API_KEY: sk-agentia-master-2026
+      WEBUI_AUTH: "false"
+      WEBUI_NAME: "MY AI COMPANY AI"
+      DEFAULT_MODELS: "gemma4-26b"
+      ENABLE_SIGNUP: "true"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ~/agentia/docker-volumes/openwebui:/app/backend/data

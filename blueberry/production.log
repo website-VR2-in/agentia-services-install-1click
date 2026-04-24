@@ -1,0 +1,52 @@
+[2026-04-24 12:56:37 +0530] [535122] [INFO] Starting gunicorn 25.3.0
+[2026-04-24 12:56:37 +0530] [535122] [INFO] Listening at: http://0.0.0.0:23450 (535122)
+[2026-04-24 12:56:37 +0530] [535122] [INFO] Using worker: sync
+[2026-04-24 12:56:37 +0530] [535125] [INFO] Booting worker with pid: 535125
+[2026-04-24 12:56:37 +0530] [535126] [INFO] Booting worker with pid: 535126
+[2026-04-24 12:56:37 +0530] [535127] [INFO] Booting worker with pid: 535127
+[2026-04-24 12:56:37 +0530] [535128] [INFO] Booting worker with pid: 535128
+[2026-04-24 12:56:37 +0530] [535122] [INFO] Control socket listening at /run/user/1000/gunicorn.ctl
+127.0.0.1 - - [24/Apr/2026:13:01:45 +0530] "GET /api/metrics HTTP/1.1" 200 201 "-" "curl/8.5.0"
+127.0.0.1 - - [24/Apr/2026:13:01:49 +0530] "GET /static_test HTTP/1.1" 200 0 "-" "curl/8.5.0"
+127.0.0.1 - - [24/Apr/2026:13:01:53 +0530] "GET / HTTP/1.1" 200 0 "-" "curl/8.5.0"
+127.0.0.1 - - [24/Apr/2026:13:03:26 +0530] "GET /static_test HTTP/1.1" 200 0 "-" "curl/8.5.0"
+127.0.0.1 - - [24/Apr/2026:13:03:31 +0530] "GET /index.html HTTP/1.1" 200 0 "-" "curl/8.5.0"
+127.0.0.1 - - [24/Apr/2026:13:10:38 +0530] "GET /index.html HTTP/1.1" 200 0 "-" "curl/8.5.0"
+[2026-04-24 13:12:22 +0530] [535122] [INFO] Handling signal: hup
+[2026-04-24 13:12:22 +0530] [535122] [INFO] Hang up: Master
+[2026-04-24 13:12:22 +0530] [536590] [INFO] Booting worker with pid: 536590
+[2026-04-24 13:12:22 +0530] [535122] [INFO] Control socket listening at /run/user/1000/gunicorn.ctl
+[2026-04-24 13:12:22 +0530] [536592] [INFO] Booting worker with pid: 536592
+[2026-04-24 13:12:22 +0530] [535122] [INFO] Control socket listening at /run/user/1000/gunicorn.ctl
+[2026-04-24 13:12:22 +0530] [536594] [INFO] Booting worker with pid: 536594
+[2026-04-24 13:12:22 +0530] [535122] [INFO] Control socket listening at /run/user/1000/gunicorn.ctl
+[2026-04-24 13:12:24 +0530] [536596] [INFO] Booting worker with pid: 536596
+[2026-04-24 13:12:24 +0530] [535126] [INFO] Worker exiting (pid: 535126)
+[2026-04-24 13:12:24 +0530] [535125] [INFO] Worker exiting (pid: 535125)
+[2026-04-24 13:12:24 +0530] [535127] [INFO] Worker exiting (pid: 535127)
+[2026-04-24 13:12:24 +0530] [535128] [INFO] Worker exiting (pid: 535128)
+[2026-04-24 13:12:24 +0530] [535122] [INFO] Control socket listening at /run/user/1000/gunicorn.ctl
+127.0.0.1 - - [24/Apr/2026:13:12:28 +0530] "GET /static_test HTTP/1.1" 200 0 "-" "curl/8.5.0"
+127.0.0.1 - - [24/Apr/2026:13:12:32 +0530] "GET / HTTP/1.1" 200 0 "-" "curl/8.5.0"
+[2026-04-24 13:13:55 +0530] [535122] [INFO] Handling signal: hup
+[2026-04-24 13:13:55 +0530] [535122] [INFO] Hang up: Master
+[2026-04-24 13:13:55 +0530] [536715] [INFO] Booting worker with pid: 536715
+[2026-04-24 13:13:55 +0530] [535122] [INFO] Control socket listening at /run/user/1000/gunicorn.ctl
+[2026-04-24 13:13:55 +0530] [536717] [INFO] Booting worker with pid: 536717
+[2026-04-24 13:13:55 +0530] [535122] [INFO] Control socket listening at /run/user/1000/gunicorn.ctl
+[2026-04-24 13:13:57 +0530] [536739] [INFO] Booting worker with pid: 536739
+[2026-04-24 13:13:57 +0530] [535122] [INFO] Control socket listening at /run/user/1000/gunicorn.ctl
+[2026-04-24 13:13:59 +0530] [536590] [INFO] Worker exiting (pid: 536590)
+[2026-04-24 13:13:59 +0530] [536596] [INFO] Worker exiting (pid: 536596)
+[2026-04-24 13:13:59 +0530] [536594] [INFO] Worker exiting (pid: 536594)
+[2026-04-24 13:13:59 +0530] [536592] [INFO] Worker exiting (pid: 536592)
+[2026-04-24 13:13:59 +0530] [536743] [INFO] Booting worker with pid: 536743
+[2026-04-24 13:13:59 +0530] [535122] [INFO] Control socket listening at /run/user/1000/gunicorn.ctl
+127.0.0.1 - - [24/Apr/2026:13:14:01 +0530] "GET / HTTP/1.1" 200 0 "-" "curl/8.5.0"
+127.0.0.1 - - [24/Apr/2026:13:18:22 +0530] "GET /api/metrics HTTP/1.1" 200 201 "-" "curl/8.5.0"
+127.0.0.1 - - [24/Apr/2026:13:18:27 +0530] "GET /static_test HTTP/1.1" 200 0 "-" "curl/8.5.0"
+127.0.0.1 - - [24/Apr/2026:13:19:26 +0530] "GET /static_test HTTP/1.1" 200 0 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0"
+127.0.0.1 - - [24/Apr/2026:13:19:26 +0530] "GET /favicon.ico HTTP/1.1" 404 207 "http://localhost:23450/static_test" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0"
+127.0.0.1 - - [24/Apr/2026:13:19:50 +0530] "GET /index.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0"
+127.0.0.1 - - [24/Apr/2026:13:23:02 +0530] "GET /api/metrics HTTP/1.1" 200 201 "-" "curl/8.5.0"
+127.0.0.1 - - [24/Apr/2026:13:23:02 +0530] "GET /static_test HTTP/1.1" 200 0 "-" "curl/8.5.0"

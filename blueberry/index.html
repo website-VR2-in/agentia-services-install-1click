@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blueberry — AI Factory</title>
+<style>
+/* ── RESET & TOKENS ─────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090f;--s0:#0d1017;--s1:#111620;--s2:#171e2c;--s3:#1e2738;
+  --bd:rgba(120,160,255,.10);--bd2:rgba(120,160,255,.20);
+  --t:#cdd5e8;--t2:#8494b8;--t3:#5060808;
+  --blue:#4f8fff;--green:#34d399;--orange:#fb923c;--red:#f87171;--yellow:#fbbf24;
+  --berry:#7c6cf8;--berry2:#a89af8;
+  --mono:'JetBrains Mono','Fira Mono',ui-monospace,monospace;
+  --sans:'Inter',system-ui,sans-serif;
+  --r:10px;--r2:14px;
+}
+body{background:var(--bg);color:var(--t);font-family:var(--sans);font-size:14px;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(100,120,255,.06), transparent);
+  pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:28px 24px}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+.header{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+.logo{width:38px;height:38px;border-radius:10px;
+  background:linear-gradient(135deg,#7c6cf8 0%,#4f8fff 100%);
+  display:flex;align-items:center;justify-content:center;font-size:20px}
+.header-text h1{font-size:20px;font-weight:700;letter-spacing:-.3px}
+.header-text h1 span{color:var(--berry2)}
+.header-text p{font-size:11px;color:var(--t2);font-family:var(--mono);margin-top:2px}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.work-badge{font-size:11px;font-family:var(--mono);padding:4px 10px;
+  border-radius:20px;border:1px solid;font-weight:600}
+.work-badge.in-work{background:rgba(52,211,153,.12);color:var(--green);border-color:rgba(52,211,153,.3)}
+.work-badge.off-work{background:rgba(251,191,36,.08);color:var(--yellow);border-color:rgba(251,191,36,.25)}
+.time-display{font-size:20px;font-weight:700;font-family:var(--mono);color:var(--t)}
+
+/* ── TELEMETRY GRID ─────────────────────────────────────── */
+.tele-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.tele-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:20px 20px 16px;position:relative;overflow:hidden;transition:border-color .3s}
+.tele-card:hover{border-color:var(--bd2)}
+.tele-card::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--accent-color,transparent) 0%,transparent 60%);
+  opacity:.06;pointer-events:none}
+.tele-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--t2);font-family:var(--mono);margin-bottom:10px}
+.tele-value{font-size:36px;font-weight:800;font-family:var(--mono);
+  line-height:1;transition:color .5s;letter-spacing:-1px}
+.tele-value span{font-size:16px;font-weight:500;color:var(--t2)}
+.tele-sub{font-size:11px;color:var(--t2);margin-top:6px;font-family:var(--mono)}
+.tele-bar-wrap{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:12px;overflow:hidden}
+.tele-bar{height:100%;border-radius:2px;transition:width .8s ease,background .5s ease}
+
+/* ── SECTION HEADERS ────────────────────────────────────── */
+.section-head{display:flex;align-items:center;gap:10px;margin:28px 0 14px}
+.section-head h2{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--t2);font-weight:600}
+.section-head::after{content:'';flex:1;height:1px;background:var(--bd)}
+.section-head .pill{font-size:10px;font-family:var(--mono);padding:2px 8px;
+  background:var(--s2);border:1px solid var(--bd);border-radius:20px;color:var(--t2)}
+
+/* ── MODEL CARDS ────────────────────────────────────────── */
+.model-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:24px}
+.model-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:18px;transition:.2s}
+.model-card:hover{border-color:var(--bd2)}
+.model-card.running{border-color:rgba(52,211,153,.25)}
+.model-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.model-name{font-size:15px;font-weight:600;color:var(--t)}
+.model-port{font-size:10px;font-family:var(--mono);color:var(--t2);margin-top:2px}
+.status-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.status-dot.on{background:var(--green);box-shadow:0 0 6px rgba(52,211,153,.6);animation:pulse-dot 2s infinite}
+.status-dot.off{background:var(--s3)}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.5}}
+.tok-rate{font-size:11px;font-family:var(--mono);color:var(--t2);margin-bottom:12px}
+.tok-rate span{color:var(--green);font-weight:700}
+
+/* ── 3-WAY TOGGLE ───────────────────────────────────────── */
+.toggle3{display:flex;background:var(--s0);border:1px solid var(--bd);
+  border-radius:8px;overflow:hidden;width:100%}
+.toggle3 button{flex:1;padding:7px 6px;font-size:11px;font-weight:700;
+  font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;
+  background:transparent;border:none;color:var(--t2);cursor:pointer;transition:.15s;border-right:1px solid var(--bd)}
+.toggle3 button:last-child{border-right:none}
+.toggle3 button:hover{background:var(--s2);color:var(--t)}
+.toggle3 button.active-on{background:rgba(52,211,153,.15);color:var(--green)}
+.toggle3 button.active-auto{background:rgba(79,143,255,.15);color:var(--blue)}
+.toggle3 button.active-off{background:rgba(248,113,113,.12);color:var(--red)}
+.model-card.always-on .toggle3 button:first-child,
+.model-card.always-on .toggle3 button:last-child{opacity:.3;pointer-events:none;cursor:not-allowed}
+
+/* ── SERVICES STRIP ─────────────────────────────────────── */
+.services-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.svc-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);
+  padding:14px 16px;display:flex;align-items:center;gap:12px;
+  text-decoration:none;transition:.2s;color:inherit}
+.svc-card:hover{border-color:var(--blue);background:var(--s2)}
+.svc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.svc-dot.up{background:var(--green)}
+.svc-dot.down{background:var(--s3)}
+.svc-info{flex:1;min-width:0}
+.svc-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.svc-port{font-size:10px;font-family:var(--mono);color:var(--t2)}
+.svc-arrow{font-size:16px;color:var(--t2);flex-shrink:0}
+
+/* ── EXTERNAL IFRAMES ───────────────────────────────────── */
+.ext-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+.ext-frame{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden}
+.ext-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;
+  background:var(--s0);border-bottom:1px solid var(--bd)}
+.ext-dots{display:flex;gap:5px}
+.ext-dots span{width:9px;height:9px;border-radius:50%}
+.ext-title{font-size:11px;font-family:var(--mono);color:var(--t2);flex:1;text-align:center}
+.ext-link{font-size:11px;color:var(--blue);text-decoration:none;font-family:var(--mono)}
+.ext-frame iframe{width:100%;height:320px;border:none;display:block;
+  background:var(--bg);opacity:.85;transition:opacity .2s}
+.ext-frame:hover iframe{opacity:1}
+
+/* ── LOG CONSOLE ────────────────────────────────────────── */
+.console{background:#050709;border:1px solid var(--bd);border-radius:var(--r2);
+  padding:16px;margin-top:24px}
+.console-head{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.console-head span{font-size:10px;font-family:var(--mono);color:var(--t2);
+  display:flex;align-items:center;gap:6px}
+.console-head span::before{content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--blue);animation:pulse-dot 2s infinite;display:inline-block}
+.console-head button{font-size:10px;color:var(--t2);background:none;border:none;
+  cursor:pointer;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px}
+.console-head button:hover{color:var(--t)}
+.console-lines{max-height:200px;overflow-y:auto;font-size:12px;font-family:var(--mono);
+  line-height:1.6;color:#4a6fa8}
+.console-lines .cl{color:var(--blue)}
+.console-empty{color:#2a3a5a;text-align:center;padding:20px 0;font-size:11px;letter-spacing:2px}
+
+/* ── UTILS ──────────────────────────────────────────────── */
+.divider{border:none;border-top:1px solid var(--bd);margin:28px 0}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;
+  font-family:var(--mono);padding:2px 7px;border-radius:4px}
+.badge-api{background:rgba(45,212,191,.1);color:#2dd4bf;border:1px solid rgba(45,212,191,.2)}
+.footer{text-align:center;color:var(--t2);font-size:11px;font-family:var(--mono);
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--bd)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">🫐</div>
+    <div class="header-text">
+      <h1>Blueberry <span>Dashboard</span></h1>
+      <p id="sub-line">Agentia v0.97 · GX10 Blackwell · loading...</p>
+    </div>
+    <div class="header-right">
+      <div class="work-badge off-work" id="work-badge">⏰ Off hours</div>
+      <div class="time-display" id="clock">--:--:--</div>
+    </div>
+  </div>
+
+  <!-- TELEMETRY ROW -->
+  <div class="tele-grid">
+    <div class="tele-card" id="card-cpu" style="--accent-color: #4f8fff">
+      <div class="tele-label">CPU</div>
+      <div class="tele-value" id="cpu-val">--<span>%</span></div>
+      <div class="tele-sub" id="cpu-sub">loading...</div>
+      <div class="tele-bar-wrap"><div class="tele-bar" id="cpu-bar"></div></div>
+    </div>
+    <div class="tele-card" id="card-ram" style="--accent-color: #7c6cf8">
+      <div class="tele-label">RAM</div>
+      <div class="tele-value" id="ram-val">--<span>%</span></div>
+      <div class="tele-sub" id="ram-sub">loading...</div>
+      <div class="tele-bar-wrap"><div class="tele-bar" id="ram-bar"></div></div>
+    </div>
+    <div class="tele-card" id="card-gpu" style="--accent-color: #34d399">
+      <div class="tele-label">GPU · GB10</div>
+      <div class="tele-value" id="gpu-val">--<span>%</span></div>
+      <div class="tele-sub" id="gpu-sub">loading...</div>
+      <div class="tele-bar-wrap"><div class="tele-bar" id="gpu-bar"></div></div>
+    </div>
+    <div class="tele-card" id="card-disk" style="--accent-color: #fb923c">
+      <div class="tele-label">DISK</div>
+      <div class="tele-value" id="disk-val">--<span>%</span></div>
+      <div class="tele-sub" id="disk-sub">loading...</div>
+      <div class="tele-bar-wrap"><div class="tele-bar" id="disk-bar"></div></div>
+    </div>
+  </div>
+
+  <!-- MODEL CARDS -->
+  <div class="section-head"><h2>Active Models</h2><span class="pill" id="model-count">0 running</span></div>
+  <div class="model-grid" id="model-grid">
+    <div style="color:var(--t2);font-family:var(--mono);font-size:12px;padding:20px">loading models...</div>
+  </div>
+
+  <!-- MANAGED SERVICES -->
+  <div class="section-head"><h2>Services</h2></div>
+  <div class="services-strip" id="services-strip">
+    <a class="svc-card" href="/openwebui" target="_blank">
+      <span class="svc-dot" id="dot-openwebui"></span>
+      <div class="svc-info"><div class="svc-name">Open WebUI</div><div class="svc-port">:44441</div></div>
+      <span class="svc-arrow">↗</span>
+    </a>
+    <a class="svc-card" href="/langfuse" target="_blank">
+      <span class="svc-dot" id="dot-langfuse"></span>
+      <div class="svc-info"><div class="svc-name">Langfuse</div><div class="svc-port">:44442</div></div>
+      <span class="svc-arrow">↗</span>
+    </a>
+    <a class="svc-card" href="/paperclip" target="_blank">
+      <span class="svc-dot" id="dot-paperclip"></span>
+      <div class="svc-info"><div class="svc-name">Paperclip</div><div class="svc-port">:44443</div></div>
+      <span class="svc-arrow">↗</span>
+    </a>
+    <div class="svc-card">
+      <span class="svc-dot" id="dot-litellm"></span>
+      <div class="svc-info">
+        <div class="svc-name">LiteLLM API</div>
+        <div class="svc-port">:33331 <span class="badge badge-api">sk-agentia-master-2026</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXTERNAL SERVICES DISCOVERED -->
+  <div class="section-head" style="margin-top:32px"><h2>External Systems</h2><span class="pill" id="ext-count">scanning...</span></div>
+  <div class="ext-grid" id="ext-grid">
+    <div style="color:var(--t2);font-family:var(--mono);font-size:12px;padding:20px">scanning ports...</div>
+  </div>
+
+  <!-- LOG CONSOLE -->
+  <div class="console">
+    <div class="console-head">
+      <span>System log</span>
+      <button onclick="logLines=[];renderLog()">clear</button>
+    </div>
+    <div class="console-lines" id="console-lines">
+      <div class="console-empty">Awaiting events...</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    🫐 Blueberry v0.97 · Agentia AI Factory · NVIDIA GB10 Blackwell ·
+    <a href="https://github.com/agentia-services/gx10-installer" style="color:var(--blue)">github.com/agentia-services/gx10-installer</a>
+  </div>
+</div>
+
+<script>
+// ── Color math: 0%→white 10-20%→blue 30-60%→green 60-90%→orange ≥90%→red ──
+function pctColor(p) {
+  if (p <= 0)  return "#ffffff";
+  if (p < 10)  { const t=p/10; return lerpHex("#ffffff","#4f8fff",t); }
+  if (p < 30)  { const t=(p-10)/20; return lerpHex("#4f8fff","#34d399",t); }
+  if (p < 60)  return "#34d399";
+  if (p < 90)  { const t=(p-60)/30; return lerpHex("#34d399","#fb923c",t); }
+  const t=Math.min((p-90)/10,1); return lerpHex("#fb923c","#f87171",t);
+}
+
+function lerpHex(a,b,t) {
+  const hr=s=>parseInt(s.slice(1,3),16);
+  const hg=s=>parseInt(s.slice(3,5),16);
+  const hb=s=>parseInt(s.slice(5,7),16);
+  const r=Math.round(hr(a)+(hr(b)-hr(a))*t);
+  const g=Math.round(hg(a)+(hg(b)-hg(a))*t);
+  const bl=Math.round(hb(a)+(hb(b)-hb(a))*t);
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${bl.toString(16).padStart(2,'0')}`;
+}
+
+function applyMetric(valEl, barEl, pct, sub) {
+  const c = pctColor(pct);
+  valEl.style.color = c;
+  barEl.style.width = pct + "%";
+  barEl.style.background = c;
+  if (sub !== undefined) sub.textContent = sub.dataset?.text || "";
+}
+
+// ── Clock + scheduler ────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById("clock").textContent =
+    String(now.getHours()).padStart(2,"0") + ":" +
+    String(now.getMinutes()).padStart(2,"0") + ":" +
+    String(now.getSeconds()).padStart(2,"0");
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+async function updateScheduler() {
+  try {
+    const r = await fetch("/api/scheduler");
+    const d = await r.json();
+    const badge = document.getElementById("work-badge");
+    if (d.in_work_hours) {
+      badge.className = "work-badge in-work";
+      badge.textContent = "🟢 Work hours — " + d.current_time;
+    } else {
+      badge.className = "work-badge off-work";
+      badge.textContent = "⏰ Off hours — " + d.current_time;
+    }
+  } catch(e) {}
+}
+
+// ── Telemetry ────────────────────────────────────────────────────────────────
+async function updateMetrics() {
+  try {
+    const r = await fetch("/api/metrics");
+    const d = await r.json();
+    // CPU
+    const cpuP = d.cpu.pct;
+    document.getElementById("cpu-val").innerHTML = Math.round(cpuP) + '<span>%</span>';
+    document.getElementById("cpu-sub").textContent = cpuP.toFixed(1) + "% average";
+    const cpuBar = document.getElementById("cpu-bar");
+    const cpuCol = pctColor(cpuP);
+    cpuBar.style.width = cpuP + "%";
+    cpuBar.style.background = cpuCol;
+    document.getElementById("cpu-val").style.color = cpuCol;
+    // RAM
+    const ramP = d.ram.pct;
+    const ramCol = pctColor(ramP);
+    document.getElementById("ram-val").innerHTML = Math.round(ramP) + '<span>%</span>';
+    document.getElementById("ram-val").style.color = ramCol;
+    document.getElementById("ram-sub").textContent = (d.ram.used_gb||0).toFixed(1) + " / " + (d.ram.total_gb||0).toFixed(1) + " GB";
+    const ramBar = document.getElementById("ram-bar");
+    ramBar.style.width = ramP + "%"; ramBar.style.background = ramCol;
+    // GPU
+    const gpuP = d.gpu.pct || 0;
+    const gpuCol = pctColor(gpuP);
+    document.getElementById("gpu-val").innerHTML = Math.round(gpuP) + '<span>%</span>';
+    document.getElementById("gpu-val").style.color = gpuCol;
+    const gpuSub = d.gpu.used_mb
+      ? Math.round(d.gpu.used_mb/1024) + " / " + Math.round((d.gpu.total_mb||131072)/1024) + " GB VRAM"
+      : (d.gpu.temp_c ? d.gpu.temp_c + "°C" : "128GB unified");
+    document.getElementById("gpu-sub").textContent = gpuSub;
+    const gpuBar = document.getElementById("gpu-bar");
+    gpuBar.style.width = gpuP + "%"; gpuBar.style.background = gpuCol;
+    // DISK
+    const diskP = d.disk.pct;
+    const diskCol = pctColor(diskP);
+    document.getElementById("disk-val").innerHTML = Math.round(diskP) + '<span>%</span>';
+    document.getElementById("disk-val").style.color = diskCol;
+    document.getElementById("disk-sub").textContent = (d.disk.used_gb||0).toFixed(0) + " / " + (d.disk.total_gb||0).toFixed(0) + " GB";
+    const diskBar = document.getElementById("disk-bar");
+    diskBar.style.width = diskP + "%"; diskBar.style.background = diskCol;
+    // Sub line
+    document.getElementById("sub-line").textContent = "Agentia v0.97 · GX10 Blackwell · " + new Date().toLocaleTimeString();
+  } catch(e) {
+    document.getElementById("sub-line").textContent = "Backend offline — check: systemctl status agentia-blueberry";
+  }
+}
+
+// ── Models ───────────────────────────────────────────────────────────────────
+async function updateModels() {
+  try {
+    const r = await fetch("/api/models");
+    const models = await r.json();
+    const grid = document.getElementById("model-grid");
+    const running = models.filter(m => m.running).length;
+    document.getElementById("model-count").textContent = running + " running";
+    grid.innerHTML = "";
+    for (const m of models) {
+      const stateClass = {"on":"active-on","auto":"active-auto","off":"active-off"}[m.state] || "active-auto";
+      const card = document.createElement("div");
+      card.className = "model-card" + (m.running?" running":"") + (m.always_on?" always-on":"");
+      card.innerHTML = `
+        <div class="model-top">
+          <div><div class="model-name">${m.id}</div><div class="model-port">:${m.port}</div></div>
+          <div class="status-dot ${m.running?"on":"off"}"></div>
+        </div>
+        <div class="tok-rate">
+          ${m.running
+            ? (m.tok_s !== null ? `<span>${Math.round(m.tok_s)}</span> tok/s` : `<span style="color:var(--green)">LIVE</span>`)
+            : `<span style="color:var(--t2)">stopped</span>`}
+          ${m.always_on ? ' · <span style="color:var(--t2);font-size:10px">always on</span>' : ''}
+        </div>
+        <div class="toggle3">
+          <button class="${m.state==='on'?stateClass:''} ${m.state==='on'?'active-on':''}" onclick="setState('${m.id}','on')">ON</button>
+          <button class="${m.state==='auto'?'active-auto':''}" onclick="setState('${m.id}','auto')">AUTO</button>
+          <button class="${m.state==='off'?'active-off':''}" onclick="setState('${m.id}','off')">OFF</button>
+        </div>`;
+      // highlight active button
+      const btns = card.querySelectorAll(".toggle3 button");
+      btns.forEach(b => b.classList.remove("active-on","active-auto","active-off"));
+      if (m.state==="on") btns[0].classList.add("active-on");
+      else if (m.state==="auto") btns[1].classList.add("active-auto");
+      else if (m.state==="off") btns[2].classList.add("active-off");
+      grid.appendChild(card);
+    }
+  } catch(e) {
+    document.getElementById("model-grid").innerHTML =
+      '<div style="color:var(--t2);font-family:var(--mono);font-size:12px;padding:20px">models unavailable — backend loading</div>';
+  }
+}
+
+async function setState(modelId, state) {
+  try {
+    await fetch("/api/state", {method:"POST",headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({model: modelId, state})});
+    addLog(`State: ${modelId} → ${state}`);
+    await updateModels();
+  } catch(e) { addLog("Error setting state"); }
+}
+
+// ── Services ─────────────────────────────────────────────────────────────────
+const KNOWN_SVCS = [
+  {id:"openwebui", port:44441},
+  {id:"langfuse",  port:44442},
+  {id:"paperclip", port:44443},
+  {id:"litellm",   port:33331}
+];
+async function updateServices() {
+  try {
+    const r = await fetch("/api/services");
+    const svcs = await r.json();
+    const portSet = new Set(svcs.map(s=>s.port));
+    for (const s of KNOWN_SVCS) {
+      const dot = document.getElementById("dot-"+s.id);
+      if (dot) { dot.className = "svc-dot " + (portSet.has(s.port) ? "up" : "down"); }
+    }
+    // External services (exclude our own managed ones)
+    const managedPorts = new Set([44440,44441,44442,44443,33331]);
+    const external = svcs.filter(s => !managedPorts.has(s.port));
+    document.getElementById("ext-count").textContent = external.length + " found";
+    const extGrid = document.getElementById("ext-grid");
+    if (external.length === 0) {
+      extGrid.innerHTML = '<div style="color:var(--t2);font-family:var(--mono);font-size:12px;padding:20px 0">No external services detected on local ports</div>';
+      return;
+    }
+    extGrid.innerHTML = "";
+    for (const s of external) {
+      const url = `http://localhost:${s.port}`;
+      const div = document.createElement("div");
+      div.className = "ext-frame";
+      div.innerHTML = `
+        <div class="ext-bar">
+          <div class="ext-dots">
+            <span style="background:#ef4444"></span>
+            <span style="background:#eab308"></span>
+            <span style="background:#22c55e"></span>
+          </div>
+          <div class="ext-title">${s.name} · :${s.port}</div>
+          <a class="ext-link" href="${url}" target="_blank">↗ open</a>
+        </div>
+        <iframe src="${url}" title="${s.name}" loading="lazy"></iframe>`;
+      extGrid.appendChild(div);
+    }
+  } catch(e) {}
+}
+
+// ── Log ──────────────────────────────────────────────────────────────────────
+let logLines = [];
+function addLog(msg) {
+  const ts = new Date().toLocaleTimeString();
+  logLines.push(`[${ts}] ${msg}`);
+  if (logLines.length > 100) logLines.shift();
+  renderLog();
+}
+function renderLog() {
+  const el = document.getElementById("console-lines");
+  if (logLines.length === 0) {
+    el.innerHTML = '<div class="console-empty">Awaiting events...</div>';
+    return;
+  }
+  el.innerHTML = logLines.slice(-50).map(l =>
+    `<div class="cl">${l}</div>`
+  ).join("");
+  el.scrollTop = el.scrollHeight;
+}
+async function fetchLog() {
+  try {
+    const r = await fetch("/api/log");
+    const lines = await r.json();
+    if (lines.length > 0) { logLines = lines; renderLog(); }
+  } catch(e) {}
+}
+
+// ── Main loop ────────────────────────────────────────────────────────────────
+async function refresh() {
+  await Promise.all([updateMetrics(), updateModels(), updateServices(), updateScheduler()]);
+}
+async function slowRefresh() { await fetchLog(); }
+
+refresh();
+setInterval(refresh, 3000);        // fast: telemetry + models
+setInterval(slowRefresh, 5000);    // slow: log
+setTimeout(updateServices, 8000);  // external scan after 8s
+
+addLog("Blueberry Dashboard loaded");
+</script>
+</body>
+</html>

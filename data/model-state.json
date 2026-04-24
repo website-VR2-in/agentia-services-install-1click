@@ -1,0 +1,8 @@
+{
+  "models": {
+    "qwen3-8b":    {"state":"auto","container":"vllm-qwen3-8b",   "port":12342,"always_on":true},
+    "gemma4-26b":  {"state":"auto","container":"vllm-gemma4-26b", "port":12343,"always_on":true},
+    "devstral-24b":{"state":"auto","container":"vllm-devstral",   "port":12344,"always_on":false},
+    "nemotron-120b":{"state":"auto","container":"vllm-nemotron",  "port":12344,"always_on":false}
+  }
+}
