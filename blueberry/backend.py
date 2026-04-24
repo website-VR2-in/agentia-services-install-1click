@@ -6,7 +6,7 @@ Provides /api/metrics, /api/models, /api/state, /api/exec for the dashboard.
 import json, os, subprocess, time, threading, signal, sys
 from pathlib import Path
 try:
-    from flask import Flask, jsonify, request, send_from_directory
+    from flask import Flask, jsonify, request, send_from_directory, make_response
     import psutil
     HAVE_FLASK = True
 except ImportError:
@@ -200,19 +200,14 @@ def discover_services():
 
 @app.route("/")
 def serve_index():
+    # Direct file serving (Gunicorn-compatible)
     try:
-        # Try using send_from_directory first
-        return send_from_directory(app.static_folder, "index.html")
+        with open("index.html", "r", encoding="utf-8") as f:
+            content = f.read()
+        return make_response(content, 200, {"Content-Type": "text/html; charset=utf-8"})
     except Exception as e:
-        app.logger.error(f"Error with send_from_directory for index.html: {e}")
-        # Fallback: read and return file directly
-        try:
-            with open("index.html", "r", encoding="utf-8") as f:
-                content = f.read()
-            return content, 200, {"Content-Type": "text/html; charset=utf-8"}
-        except Exception as e2:
-            app.logger.error(f"Error reading index.html directly: {e2}")
-            return f"Error serving index.html: {e2}", 500
+        app.logger.error(f"Error serving index.html: {e}")
+        return f"Error serving index.html: {e}", 500
 
 @app.route("/static_test")
 def serve_static_test():

@@ -35,12 +35,15 @@ echo "🌐 Access the dashboard at: http://localhost:23450"
 echo "📊 API endpoints: http://localhost:23450/api/*"
 echo ""
 
-# Start Gunicorn
+# Start Gunicorn with increased buffers and timeouts
 exec gunicorn \
     -w 4 \
     -b 0.0.0.0:23450 \
     --access-logfile production.log \
     --error-logfile production.log \
-    --timeout 120 \
-    --keep-alive 5 \
+    --timeout 300 \
+    --keep-alive 30 \
+    --limit-request-line 8190 \
+    --limit-request-fields 100 \
+    --limit-request-field_size 32768 \
     backend:app

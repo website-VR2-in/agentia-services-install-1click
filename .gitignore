@@ -1,0 +1,53 @@
+# Agentia .gitignore - Clean Repository
+
+# Virtual environments
+venv/
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+*.log
+logs/
+
+# Docker volumes
+docker-volumes/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Test files (keep only essential ones)
+test_*.html
+simple_test.html
+
+# Backup files
+*~
+#*#
+*.bak
+
+# Build files
+build/
+dist/
+
+# Local configuration
+.config
+.local
+
+# Docker compose override
+docker-compose.override.yml
+
+# Python package files
+*.egg-info/
